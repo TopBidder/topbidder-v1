@@ -533,6 +533,12 @@ contract ArtistBase is Ownable,ERC721Full,RadicalNFT,ReentrancyGuard {
         require(_exists(tokenId));
         return arts[tokenId].ipfs;
     }
+
+    function checkArtBidable(uint256 tokenId) external view returns (bool) {
+        require(_exists(tokenId));
+        return arts[tokenId].bid;
+    }
+
     function openBidTokenAuthority() 
         external
         onlyCLevel
