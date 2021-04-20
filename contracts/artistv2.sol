@@ -355,11 +355,11 @@ contract IRadicalNFT is IERC165 {
 }
 contract RadicalNFT is ERC165,IRadicalNFT {
 
-    bytes4 private constant _INTERFACE_ID_RADICALNFT = 
-        bytes4(keccak256('round(uint256)')) ^
-        bytes4(keccak256('price(uint256)')) ^
-        bytes4(keccak256('getBidStartTime(uint256)')) ^
-        bytes4(keccak256('bid(address,uint256)'));
+    bytes4 private constant _INTERFACE_ID_RADICALNFT = 0x9203c74e;
+ //       bytes4(keccak256('round(uint256)')) ^
+ //       bytes4(keccak256('price(uint256)')) ^
+ //       bytes4(keccak256('getBidStartTime(uint256)')) ^
+ //       bytes4(keccak256('bid(address,uint256)'));
 
     constructor () public {
         _registerInterface(_INTERFACE_ID_RADICALNFT);
