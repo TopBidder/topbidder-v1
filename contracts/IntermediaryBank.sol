@@ -104,20 +104,18 @@ address public _admin;
         emit LOG_ETHTRANSFER(_to, balance);
     }
     
-    function transfer(address _to, uint256 _amountInBID)
+    function transfer(address _to, uint256 _rawAmount)
         external
     {
         require(msg.sender == _admin, "ERR_NOT_ADMIN");
         
         uint256 balance=address(this).balance;
         
-        uint256 amount=_amountInBID.mul(1 ether);
+        require(_rawAmount<balance, "amount exceed balance");
         
-        require(amount<balance, "amount exceed balance");
-        
-        (bool success, ) =address(uint160(_to)).call.value(amount)("");
+        (bool success, ) =address(uint160(_to)).call.value(_rawAmount)("");
         require(success,"ERR contract transfer eth fail,maybe gas fail");
-        emit LOG_ETHTRANSFER(_to, amount);
+        emit LOG_ETHTRANSFER(_to, _rawAmount);
     }
   
 }
