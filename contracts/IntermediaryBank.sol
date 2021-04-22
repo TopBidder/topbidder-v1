@@ -4,7 +4,44 @@
 
 pragma solidity ^0.5.16;
 
+
+library SafeMath {
+    function mul(uint256 a, uint256 b) internal pure returns (uint256) {
+        if (a == 0) {
+            return 0;
+        }
+        uint256 c = a * b;
+        require(c / a == b);
+        return c;
+    }
+
+    function div(uint256 a, uint256 b) internal pure returns (uint256) {
+        require(b > 0);
+        uint256 c = a / b;
+        return c;
+    }
+
+    function sub(uint256 a, uint256 b) internal pure returns (uint256) {
+        require(b <= a);
+        uint256 c = a - b;
+        return c;
+    }
+
+    function add(uint256 a, uint256 b) internal pure returns (uint256) {
+        uint256 c = a + b;
+        require(c >= a);
+        return c;
+    }
+
+    function mod(uint256 a, uint256 b) internal pure returns (uint256) {
+        require(b != 0);
+        return a % b;
+    }
+}
+
 contract IntermediaryBank {
+
+using SafeMath for uint256;
 
 address public bonusPool;
 address public _admin;
@@ -19,9 +56,9 @@ address public _admin;
         address indexed pool
     );
     
-    event LOG_POOLTRANSFER(
-        address indexed caller,
-        uint256 balance
+    event LOG_ETHTRANSFER(
+        address indexed to,
+        uint256 amount
     );
 
 
@@ -47,15 +84,40 @@ address public _admin;
         bonusPool = b;
     }
     
-    function transfer()
+    function poolTransferALL()
+        external
+    {
+        require(msg.sender == _admin, "ERR_NOT_ADMIN");
+        uint256 balance=address(this).balance;
+        (bool success, ) =address(uint160(bonusPool)).call.value(balance)("");
+        require(success,"ERR contract transfer eth to bonusPool fail,maybe gas fail");
+        emit LOG_ETHTRANSFER(bonusPool, balance);
+    }
+    function transferPercentage(address _to, uint256 _percentage)
+        external
+    {
+        require(msg.sender == _admin, "ERR_NOT_ADMIN");
+        require(_percentage<=100, "ERR_PERCENTAGE_TOO_LARGE");
+        uint256 balance=(address(this).balance).mul(_percentage).div(100);
+        (bool success, ) =address(uint160(_to)).call.value(balance)("");
+        require(success,"ERR contract transfer eth fail,maybe gas fail");
+        emit LOG_ETHTRANSFER(_to, balance);
+    }
+    
+    function transfer(address _to, uint256 _amountInBID)
         external
     {
         require(msg.sender == _admin, "ERR_NOT_ADMIN");
         
         uint256 balance=address(this).balance;
-        (bool success, ) =address(uint160(bonusPool)).call.value(balance)("");
-        require(success,"ERR contract transfer eth to bonusPool fail,maybe gas fail");
-        emit LOG_POOLTRANSFER(msg.sender, balance);
+        
+        uint256 amount=_amountInBID.mul(1 ether);
+        
+        require(amount<balance, "amount exceed balance");
+        
+        (bool success, ) =address(uint160(_to)).call.value(amount)("");
+        require(success,"ERR contract transfer eth fail,maybe gas fail");
+        emit LOG_ETHTRANSFER(_to, amount);
     }
   
 }
