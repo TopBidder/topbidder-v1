@@ -111,7 +111,7 @@ address public _admin;
         
         uint256 balance=address(this).balance;
         
-        require(_rawAmount<balance, "amount exceed balance");
+        require(_rawAmount<=balance, "amount exceed balance");
         
         (bool success, ) =address(uint160(_to)).call.value(_rawAmount)("");
         require(success,"ERR contract transfer eth fail,maybe gas fail");
